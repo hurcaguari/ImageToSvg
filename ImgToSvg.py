@@ -91,7 +91,7 @@ def ImgToSvg(*img_paths):
             print('文件不存在:', img_path)
 
 
-# 按装订区域中的绿色按钮以运行脚本。
+# 按装订区域中的绿色按钮以运行脚本。。
 if __name__ == '__main__':
     path = input('输入文件路径')
     path = os.path.realpath(path)
