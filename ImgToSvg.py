@@ -1,6 +1,7 @@
-from PIL import Image, ImageOps
-import numpy as np
 import os
+
+import numpy as np
+from PIL import Image, ImageOps
 
 
 def convert_png_to_jpg(image_path):
@@ -94,5 +95,5 @@ def ImgToSvg(*img_paths):
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
     path = input('输入文件路径')
-    path = os.path.realpath(path)
+    path = os.path.realpath(r'{}'.format(path))
     ImgToSvg(path)
