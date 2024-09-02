@@ -94,6 +94,7 @@ def ImgToSvg(*img_paths):
 
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
-    path = input('输入文件路径')
+    path = "C:\\Users\\Hurca\\Desktop\\KV拷贝.bmp"#input('输入文件路径')
     path = os.path.realpath(r'{}'.format(path))
     ImgToSvg(path)
+
