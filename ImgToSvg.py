@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 from PIL import Image, ImageOps
+import argparse
 
 
 def convert_png_to_jpg(image_path):
@@ -36,6 +37,7 @@ def convert_to_bmp(image_path):
     :return: 输出bmp格式文件路径
     """
     if os.path.splitext(image_path)[1] in ['.jpg', '.jpeg', '.JPG', '.JPEG']:
+        print('传入文件不为BMP正在转换为bmp格式', image_path)
         img = Image.open(image_path)
         ary = np.array(img)
 
@@ -71,7 +73,7 @@ def out_svg(file):
     if os.path.splitext(file)[1] in ['.bmp', '.BMP']:
         img_type = False
     file = os.path.abspath(file)
-    cmd_path = os.path.abspath('potraces//potrace.exe')
+    cmd_path = os.path.join(os.path.dirname(__file__), 'potraces', 'potrace.exe')
     file = convert_to_bmp(file) if not os.path.splitext(file)[1] == '.bmp' else file
     # 判断文件格式如果是bmp就交到下一步不是就调用out_bmp将图片转换到bmp
     if file:
@@ -86,15 +88,19 @@ def ImgToSvg(*img_paths):
     print('\n')
     for img_path in img_paths:
         if os.path.exists(img_path):
-            print('处理文件路径:', img_path, end=' ')
+            print('处理文件路径:', img_path, end='\n')
             print(out_svg(img_path))
+            print('OK\n',end=' ')
         else:
             print('文件不存在:', img_path)
 
 
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
-    path = "C:\\Users\\Hurca\\Desktop\\KV拷贝.bmp"#input('输入文件路径')
-    path = os.path.realpath(r'{}'.format(path))
-    ImgToSvg(path)
-
+    print('支持的文件类型有:png,jpg,bmp。')
+    print('如需更快的执行速度请直接传入bmp格式图片。')
+    parser = argparse.ArgumentParser(description='转换图片到svg矢量格式.')
+    parser.add_argument('img_paths', metavar='N', type=str, nargs='+', help='输入要转换的文件路径。')
+    args = parser.parse_args()
+    print('程序运行中请稍后，正在处理图片...{}'.format(args.img_paths))
+    ImgToSvg(*args.img_paths)
