@@ -97,6 +97,7 @@ def ImgToSvg(*img_paths):
 
 # 按装订区域中的绿色按钮以运行脚本。
 if __name__ == '__main__':
+    # 这里是程序主入口
     print('支持的文件类型有:png,jpg,bmp。')
     print('如需更快的执行速度请直接传入bmp格式图片。')
     parser = argparse.ArgumentParser(description='转换图片到svg矢量格式.')
