@@ -33,7 +33,7 @@ def convert_to_jpg(image_path):
 
 def convert_to_bmp(image_path):
     """
-    :param image_path: 输入任意格式图片文件，不支持的会陷入死循环
+    :param image_path: 任意图片文件
     :return: 输出bmp格式文件路径
     """
     if os.path.splitext(image_path)[1] in ['.jpg', '.jpeg', '.JPG', '.JPEG']:
@@ -42,18 +42,22 @@ def convert_to_bmp(image_path):
         ary = np.array(img)
 
         # 将 RGB 图像转换为灰度图像
-        r, g, b = np.split(ary, 3, axis=2)
-        gray = list(
-            map(lambda x: 0.299 * x[0] + 0.587 * x[1] + 0.114 * x[2], zip(r.reshape(-1), g.reshape(-1), b.reshape(-1))))
-        bitmap = np.array(gray).reshape((ary.shape[0], ary.shape[1]))
-        bitmap = np.dot((bitmap > 128).astype(float), 255)
+        if ary.shape[2] == 3:  # 确保图像有三个通道
+            r, g, b = np.split(ary, 3, axis=2)
+            gray = list(
+                map(lambda x: 0.299 * x[0] + 0.587 * x[1] + 0.114 * x[2], zip(r.reshape(-1), g.reshape(-1), b.reshape(-1))))
+            bitmap = np.array(gray).reshape((ary.shape[0], ary.shape[1]))
+            bitmap = np.dot((bitmap > 128).astype(float), 255)
 
-        # 保存为 BMP 文件
-        im = Image.fromarray(bitmap.astype(np.uint8))
+            # 保存为 BMP 文件
+            im = Image.fromarray(bitmap.astype(np.uint8))
 
-        name = os.path.splitext(image_path)[0] + '.bmp'
-        im.save(name)
-        return name
+            name = os.path.splitext(image_path)[0] + '.bmp'
+            im.save(name)
+            return name
+        else:
+            print('图像不包含三个通道 [R,G,B]')
+            return False
     elif os.path.splitext(image_path)[1] in ['.png', '.PNG']:
         jpg_file = convert_png_to_jpg(image_path)
         outfile = convert_to_bmp(jpg_file)
@@ -90,7 +94,6 @@ def ImgToSvg(*img_paths):
         if os.path.exists(img_path):
             print('处理文件路径:', img_path, end='\n')
             print(out_svg(img_path))
-            print('OK\n',end=' ')
         else:
             print('文件不存在:', img_path)
 
