@@ -1,1 +1,0 @@
-pyinstaller --onefile ImgToSvg.py --add-data "potraces/*;potraces"

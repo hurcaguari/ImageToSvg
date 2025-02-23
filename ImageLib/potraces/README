@@ -1,0 +1,154 @@
+POTRACE - 将位图转换为矢量图形
+
+* * *
+
+描述
+
+Potrace 是一个用于跟踪位图的工具，这意味着将位图转换为平滑、可缩放的图像。输入是位图（PBM、PGM、PPM 或 BMP），输出是几种矢量文件格式之一。典型的用途是从扫描数据（如公司或大学徽标、手写笔记等）创建 SVG 或 PDF 文件。生成的图像不像位图那样“锯齿状”，而是平滑的。然后可以以任何分辨率渲染它。
+
+Potrace 目前可以生成以下输出格式：SVG、PDF、EPS、PostScript、DXF、GeoJSON、PGM（用于轻松抗锯齿像素图像）、Gimppath 和 XFig。将来可能会添加其他后端。
+
+还提供了一个单独的程序 mkbitmap。该程序可以作为 Potrace 的预处理器，在将图像转换为位图之前对其应用缩放和各种滤镜。这对于跟踪灰度和彩色图像非常有用。
+
+依赖关系
+
+Potrace 依赖于 zlib 库进行 PostScript 3 级压缩。此库已预安装在大多数现代系统上。如果不存在，可以从 http://www.gzip.org/zlib/ 获取。
+
+编译
+
+有关通用编译说明，请参阅文件 INSTALL。此外，还支持以下编译时选项（./configure 的选项）。
+
+--with-libpotrace 安装 Potrace 库和头文件（默认：否）
+--disable-zlib 禁用 PostScript 3 级压缩
+--enable-metric 使用公制单位（厘米）作为默认值
+--enable-a4 使用 a4 作为默认纸张大小
+--enable-dumb-tty 使用简化的仅 ASCII 进度条
+--with-included-getopt 避免使用系统范围的 getopt 库
+
+另请参阅 ./configure --help。
+
+安装
+
+如果您是从源代码安装，只需以 root 身份执行“make install”。如果您是从二进制发行版安装，只需将“potrace”和“mkbitmap”二进制文件复制到操作系统期望它们的位置，例如 /usr/local/bin。还将文件“potrace.1”和“mkbitmap.1”复制到操作系统查找手册页的目录，例如 /usr/local/man/man1。有关在 Windows 下安装 Potrace 的说明，请参阅文件 README-WIN。
+
+用法
+
+有关更详细的用法信息，请参阅手册页。
+
+用法：potrace [选项] [文件名...]
+常规选项：
+-h, --help - 打印此帮助信息并退出
+-v, --version - 打印版本信息并退出
+-l, --license - 打印许可证信息并退出
+文件选择：
+<filename> - 输入文件
+-o, --output <filename> - 将所有输出写入此文件
+-- - 选项结束；0 或更多输入文件名跟随
+后端选择：
+-b, --backend <name> - 按名称选择后端
+-b svg, -s, --svg - SVG 后端（可缩放矢量图形）
+-b pdf - PDF 后端（便携式文档格式）
+-b pdfpage - 固定页面大小的 PDF 后端
+-b eps, -e, --eps - EPS 后端（封装 PostScript）（默认）
+-b ps, -p, --postscript - PostScript 后端
+-b pgm, -g, --pgm - PGM 后端（便携式灰度图）
+-b dxf - DXF 后端（绘图交换格式）
+-b geojson - GeoJSON 后端
+-b gimppath - Gimppath 后端（GNU Gimp）
+-b xfig - XFig 后端
+算法选项：
+-z, --turnpolicy <policy> - 如何解决路径分解中的歧义
+-t, --turdsize <n> - 抑制大小最多为此的斑点（默认 2）
+-a, --alphamax <n> - 角点阈值参数（默认 1）
+-n, --longcurve - 关闭曲线优化
+-O, --opttolerance <n> - 曲线优化容差（默认 0.2）
+-u, --unit <n> - 将输出量化为 1/单位像素（默认 10）
+-d, --debug <n> - 生成类型为 n 的调试输出（n=1,2,3）
+缩放和放置选项：
+-P, --pagesize <format> - 页面大小（默认是 letter）
+-W, --width <dim> - 输出图像的宽度
+-H, --height <dim> - 输出图像的高度
+-r, --resolution <n>[x<n>] - 分辨率（以 dpi 为单位）（基于维度的后端）
+-x, --scale <n>[x<n>] - 缩放因子（基于像素的后端）
+-S, --stretch <n> - y 分辨率/x 分辨率
+-A, --rotate <angle> - 逆时针旋转角度
+-M, --margin <dim> - 边距
+-L, --leftmargin <dim> - 左边距
+-R, --rightmargin <dim> - 右边距
+-T, --topmargin <dim> - 上边距
+-B, --bottommargin <dim> - 下边距
+--tight - 删除输入图像周围的空白
+颜色选项，某些后端支持：
+-C, --color #rrggbb - 设置前景色（默认黑色）
+--fillcolor #rrggbb - 设置填充颜色（默认透明）
+--opaque - 使白色形状不透明
+SVG 选项：
+--group - 将相关路径分组
+--flat - 整个图像作为单一路径
+Postscript/EPS/PDF 选项：
+-c, --cleartext - 不压缩输出
+-2, --level2 - 使用 postscript 2 级压缩（默认）
+-3, --level3 - 使用 postscript 3 级压缩
+-q, --longcoding - 不优化文件大小
+PGM 选项：
+-G, --gamma <n> - 抗锯齿的伽马值（默认 2.2）
+前端选项：
+-k, --blacklevel <n> - 输入文件中的黑/白截止值（默认 0.5）
+-i, --invert - 反转位图
+进度条选项：
+--progress - 显示进度条
+--tty <mode> - 进度条渲染：vt100 或 dumb
+
+维度可以有可选单位，例如 6.5in、15cm、100pt。默认是英寸（或 pgm、dxf 和 gimppath 后端的像素）。可能的输入文件格式是：pnm（pbm、pgm、ppm）、bmp。后端是：svg、pdf、pdfpage、eps、postscript、ps、dxf、geojson、pgm、gimppath、xfig。
+
+POTRACE 库（供开发人员使用）
+
+从 Potrace 1.6 版开始，Potrace 核心功能已分离到库 libpotrace.a 中。这使得将跟踪功能集成到其他 GPL 程序中变得容易。库的 API 在头文件 potracelib.h 中定义，并在 doc/potracelib.pdf 中记录。默认情况下不会安装，但可以使用 --with-libpotrace 配置选项进行安装。
+
+文档
+
+使用信息包含在手册页中：
+http://potrace.sourceforge.net/potrace.html
+
+许多常见问题在 FAQ 中回答：
+http://potrace.sourceforge.net/faq.html
+
+一些示例在以下网页上给出：
+http://potrace.sourceforge.net/samples.html
+http://potrace.sourceforge.net/mkbitmap.html
+
+potrace 算法的内部工作原理在这里解释：
+http://potrace.sourceforge.net/potrace.pdf
+
+potrace 库记录在这里：
+http://potrace.sourceforge.net/potracelib.pdf
+
+版权
+
+版权所有 (C) 2001-2019 Peter Selinger
+
+“Potrace”名称的使用受单独政策的约束，请参阅以下商标。
+
+该程序是自由软件；您可以根据自由软件基金会发布的 GNU 通用公共许可证的条款重新分发和/或修改该程序；许可证的第 2 版或（根据您的选择）任何更高版本。
+
+发布该程序的目的是希望它能有用，但没有任何担保；甚至没有适销性或特定用途适用性的隐含担保。有关详细信息，请参阅 GNU 通用公共许可证。
+
+您应该已经收到该程序的 GNU 通用公共许可证的副本；如果没有，请写信给自由软件基金会，地址是：51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA。另请参阅 http://www.gnu.org/。
+
+有关详细信息，请参阅文件 COPYING。
+
+商标
+
+“Potrace”是 Peter Selinger 的商标。
+
+使用“Potrace”名称的政策。如果您计划修改 Potrace，包括将 Potrace 移植到另一种编程语言，请注意以下事项。虽然 Potrace 的源代码是根据 GNU 通用公共许可证许可的，但“Potrace”名称是我的商标，只有在获得我的许可后才能使用。
+
+实际上，我将允许在将 Potrace 移植到另一种编程语言时使用“Potrace”名称，前提是移植符合 GNU 通用公共许可证的条款并生成与原始 Potrace 相同的高质量矢量化输出。存在错误或未生成高质量输出的移植不允许使用“Potrace”名称。为了确保遵守此政策，请在公开发布之前将您的移植提交给我审核。此外，如果您使用“Potrace”名称（或任何衍生名称，例如“MyPotrace”），您必须提供一个我可以联系到您的姓名和电子邮件地址。匿名发布或作者无法联系或不回复电子邮件或错误报告的 Potrace 衍生版本不允许使用“Potrace”名称。
+
+此政策的目的是允许人们将 Potrace 移植到尽可能多的编程语言，同时确保所有此类移植都具有与“Potrace”名称相关的相同高质量。
+
+GPG 密钥
+
+Peter Selinger 的 GPG 密钥的指纹是：
+12A2 4B3C 3790 B688 E484 7A98 A68B CC37 CA31 696A
+这可能对验证 Potrace 的未来版本有用。
