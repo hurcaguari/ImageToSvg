@@ -2,4 +2,4 @@
 图片转SVG
 打包命令:  
 ```sh
-pyinstaller main.spec
+pyinstaller main.spec VectorConversion.exe
