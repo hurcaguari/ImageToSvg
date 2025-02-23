@@ -17,7 +17,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='转换图片到矢量格式.')
     parser.add_argument('img_paths', metavar='P', type=str, nargs='+', help='输入要转换的文件路径(支持文件夹): [png,jpg,bmp]')
     parser.add_argument('-t', '--type', metavar='T', type=str, nargs='?', default='svg', help='要输出的文件类型(默认: svg): [svg,eps]')
-    
+
     # 如果没有提供参数，则显示帮助信息
     if len(os.sys.argv) == 1:
         parser.print_help()

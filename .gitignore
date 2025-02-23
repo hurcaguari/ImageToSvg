@@ -1,3 +1,4 @@
 /dist
 /build
 /test_img
+/__pycache__

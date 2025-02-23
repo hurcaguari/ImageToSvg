@@ -1,5 +1,6 @@
 import os
 import uuid
+import warnings
 
 from PIL import Image, ImageOps
 
@@ -7,6 +8,9 @@ import logging
 
 # 配置日志记录器
 logger = logging.getLogger("Vector")
+
+# 或者禁用 DecompressionBombWarning 警告
+warnings.simplefilter('ignore', Image.DecompressionBombWarning)
 
 TMP_PATH = os.getenv('TEMP', '/tmp')
 
@@ -36,13 +40,16 @@ def convert_jpg(image_path,name):
     if not image_path.lower().endswith('.png'):
         return logger.warning(f"[格式错误]: 输入文件不是PNG格式 -x {image_path}")
     img = Image.open(image_path)
-    alpha = img.getchannel('A')
-    alpha = Image.merge('RGB', (alpha, alpha, alpha))
-
-    alpha = ImageOps.invert(alpha)
     jpg_path = os.path.join(TMP_PATH,name + '.jpg')
-    alpha.save(jpg_path, 'JPEG')
-    return jpg_path
+    if img.mode == 'RGBA':
+        alpha = img.getchannel('A') 
+        alpha = Image.merge('RGB', (alpha, alpha, alpha))
+        alpha = ImageOps.invert(alpha)
+        alpha.save(jpg_path, 'JPEG')
+        return jpg_path
+    else:
+        img.save(jpg_path, 'JPEG')
+        return jpg_path
 
 def convert_bmp(image_path,name):
     """
@@ -139,26 +146,29 @@ def VectorConversion(*paths,out_type='svg'):
     :return date: 图片信息
     """
     def vector(path,out_type='svg'):
-        if not path.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp')):
-            return logger.warning(f"[格式错误]: 输入文件不是PNG,JPG,BMP格式 -x {path}")
-        logger.info(f'[处理文件]: {path} -> [{out_type}]:{os.path.splitext(path)[0]}.{out_type}')
-        path = os.path.abspath(path)
-        date = image_property(path)
-        if date['format'] == 'JPEG':
-            if date['mode'] == 'CMYK':
-                date['temp']['rgb'] = convert_rgb(path,date['id'])
-                date['temp']['bmp'] = convert_bmp(date['temp']['rgb'],date['id'])
+        try:
+            if not path.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp')):
+                return logger.warning(f"[格式错误]: 输入文件不是PNG,JPG,BMP格式 -x {path}")
+            logger.info(f'[处理文件]: {path} -> [{out_type}]:{os.path.splitext(path)[0]}.{out_type}')
+            path = os.path.abspath(path)
+            date = image_property(path)
+            if date['format'] == 'JPEG':
+                if date['mode'] == 'CMYK':
+                    date['temp']['rgb'] = convert_rgb(path,date['id'])
+                    date['temp']['bmp'] = convert_bmp(date['temp']['rgb'],date['id'])
+                else:
+                    date['temp']['bmp'] = convert_bmp(path,date['id'])
+            elif date['format'] == 'PNG':
+                date['temp']['jpg'] = convert_jpg(path,date['id'])
+                date['temp']['bmp'] = convert_bmp(date['temp']['jpg'],date['id'])
             else:
-                date['temp']['bmp'] = convert_bmp(path,date['id'])
-        elif date['format'] == 'PNG':
-            date['temp']['jpg'] = convert_jpg(path,date['id'])
-            date['temp']['bmp'] = convert_bmp(date['temp']['jpg'],date['id'])
-        else:
-            return logger.warning(f"[格式错误]: 输入文件不是PNG,JPG格式 -x {path}")
-        out_path = os.path.splitext(path)[0] + f'.{out_type}'
-        potrace_cmd(date['temp']['bmp'],out_path,type=out_type)
-        RecycleTempFiles(date)
-        return date
+                return logger.warning(f"[格式错误]: 输入文件不是PNG,JPG格式 -x {path}")
+            out_path = os.path.splitext(path)[0] + f'.{out_type}'
+            potrace_cmd(date['temp']['bmp'],out_path,type=out_type)
+            RecycleTempFiles(date)
+            return date
+        except Exception as e:
+            logger.error(f'[数据错误]: {e}')
     dates = []
     for p in paths:
         if os.path.isdir(p):
