@@ -5,6 +5,7 @@ import os
 import sys
 from ImageLib import VectorConversion
 from ImageLib import setup_logging
+from ImageLib.Files import SUPPORTED_OUTPUT_FORMATS
 
 
 if __name__ == '__main__':
@@ -19,7 +20,7 @@ if __name__ == '__main__':
     parser.add_argument('img_paths', metavar='P', type=str, nargs='+', 
                        help='输入要转换的文件路径(支持文件夹): [png,jpg,bmp]')
     parser.add_argument('-t', '--type', metavar='T', type=str, nargs='?', 
-                       default='svg', choices=['svg', 'eps', 'pdf'],
+                       default='svg', choices=list(SUPPORTED_OUTPUT_FORMATS),
                        help='要输出的文件类型(默认: svg): [svg,eps,pdf]')
 
     # 如果没有提供参数，则显示帮助信息

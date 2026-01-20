@@ -105,7 +105,7 @@ def potrace_cmd(image_path: str, out_path: str, type: str = 'svg') -> Optional[s
     :param type: 输出格式类型 [svg, eps, pdf]
     :return: 命令执行状态信息，失败返回None
     """
-    if not image_path.lower().endswith(('.bmp', '.BMP')):
+    if not image_path.lower().endswith('.bmp'):
         logger.warning(f"[格式错误]: BMP格式文件才能转换为矢量格式 -x {image_path}")
         return None
     
