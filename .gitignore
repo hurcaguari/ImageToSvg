@@ -2,3 +2,6 @@
 /build
 /test_img
 /__pycache__
+__pycache__/
+*.pyc
+*.pyo
